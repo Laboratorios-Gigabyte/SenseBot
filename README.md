@@ -6,8 +6,6 @@
 - [Getting Started](#getting-started)
   - [Installing and Starting Apache Kafka](#installing-and-starting-apache-kafka)
   - [Up and Running](#up-and-running)
-- [Usage](#usage)
-- [Contributing](#contributing)
 - [License](#license)
 
 ## Introduction
@@ -121,6 +119,8 @@ That's it! You've successfully installed and started Apache Kafka on your system
         ./gradlew dependencies
       ```
 For most scenarios just run **Build and run the application** step.
+
+Remember to replace **./gradlew** with **gradlew.bat** on Windows if you're using the Windows command prompt.
 
 ## Up and Running
 As we can see here after running **Build and run the Application**
