@@ -1,0 +1,7 @@
+logging:
+  level:
+    root: INFO
+  file: my-application.log
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  append: true
