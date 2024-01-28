@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.IntStream;
 
 @Service
 public class GeneratorService {
@@ -44,29 +45,36 @@ public class GeneratorService {
     }
 
     public void produceMessages(String topicName, int numberOfMessages, int sleep) {
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+//        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         for (int i = 0; i < numberOfMessages; i++) {
-            CompletableFuture.runAsync(() -> {
-                try {
-                    if (sleep > 0) {
-                        Thread.sleep(sleep);
-                    }
-                    Map<String, Object> json2Publish = new HashMap<>();
-                    String sensor = faker.internet().macAddress("sensor_");
-                    json2Publish.put("sensor_name", sensor);
-                    json2Publish.put("sensor_metadata", getSensorField());
-                    json2Publish.put("value", faker.number().randomDouble(5, 0, 100));
-                    String message = objectMapper.writeValueAsString(json2Publish);
-//                    LOGGER.info("GeneratorService::generatedJsonString json={}", message);
-                    kafkaProducerService.sendMessage(topicName, sensor, message);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt(); // Proper interruption handling
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            }, threadPoolExecutor);
+            CompletableFuture.runAsync(() -> message(topicName, sleep, "COMPLETABLE_FUTURE"), threadPoolExecutor);
         }
+    }
 
+    public void produceMessagesParallelStreams(String topicName, int numberOfMessages, int sleep) {
+        IntStream.range(0, numberOfMessages)
+          .parallel() // Convert to a parallel stream
+          .forEach(i -> message(topicName, sleep, "PARALLEL_STREAMS"));
+    }
+
+    private void message(String topicName, int sleep, String tag) {
+        try {
+            if (sleep > 0) {
+                Thread.sleep(sleep);
+            }
+            Map<String, Object> json2Publish = new HashMap<>();
+            String sensor = faker.internet().macAddress("sensor_");
+            json2Publish.put("sensor_name", sensor);
+            json2Publish.put("sensor_metadata", getSensorField());
+            json2Publish.put("value", faker.number().randomDouble(5, 0, 100));
+            String message = objectMapper.writeValueAsString(json2Publish);
+            LOGGER.info("GeneratorService::generatedJsonString::{} json={}", tag, message);
+            kafkaProducerService.sendMessage(topicName, sensor, message);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // Proper interruption handling
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private SensorData getSensorField() {

@@ -23,7 +23,8 @@ public class SenseBotController {
     public String publishMessages(@RequestBody MessageRequest messageRequest) {
         String topicName = messageRequest.topicName();
         int numberOfMessages = messageRequest.numberOfMessages();
-        generatorService.produceMessages(topicName, numberOfMessages, messageRequest.sleep());
+//        generatorService.produceMessages(topicName, numberOfMessages, messageRequest.sleep());
+        generatorService.produceMessagesParallelStreams(topicName, numberOfMessages, messageRequest.sleep());
         return "Messages %d published to topic: %s".formatted(numberOfMessages, topicName);
     }
 

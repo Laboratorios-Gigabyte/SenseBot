@@ -26,7 +26,7 @@ public class KafkaProducerService {
             if (ObjectUtils.isEmpty(throwable)) {
                 //success
                 RecordMetadata recordMetadata = sendResult.getRecordMetadata();
-                log.info("Kafka::producer:: topic={}, partition={}, offset={}", topic, recordMetadata.partition(), recordMetadata.offset());
+//                log.info("Kafka::producer topic={}, partition={}, offset={}", topic, recordMetadata.partition(), recordMetadata.offset());
             } else {
                 //failure
                 log.info("Kafka::producer::exception topic={}", topic, throwable);

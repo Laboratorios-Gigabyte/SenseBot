@@ -26,14 +26,18 @@ public class BackpressureThreadPoolExecutor extends ThreadPoolExecutor {
     @Override
     public void execute(Runnable command) {
         int queueSize = getQueue().size();
-
         if (queueSize >= highWatermark) {
-            LOGGER.info("Queue is full. Slowing down task submission.");
             // Sleep for a while to slow down task submission
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+            int maxDelayMillis = 60000; // Maximum delay of 60 seconds
+            int delayMillis = 1000; // Initial delay of 1 second
+            while (delayMillis < maxDelayMillis) {
+                try {
+                    LOGGER.info("Queue is full. Slowing down task submission: {} millis", delayMillis);
+                    Thread.sleep(delayMillis);
+                    delayMillis *= 2; // Double the delay for each retry
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
         }
 
