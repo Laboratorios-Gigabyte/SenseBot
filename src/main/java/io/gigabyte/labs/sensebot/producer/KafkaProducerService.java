@@ -20,12 +20,13 @@ public class KafkaProducerService {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void sendMessage(String topic, String key, String message) {
+    public void sendMessage(String topic, String key, String message, long start) {
         CompletableFuture<SendResult<String, String>> sendResultCompletableFuture = kafkaTemplate.send(topic, key, message);
         sendResultCompletableFuture.whenComplete((sendResult, throwable) -> {
             if (ObjectUtils.isEmpty(throwable)) {
                 //success
                 RecordMetadata recordMetadata = sendResult.getRecordMetadata();
+                log.info("Time Taken to Produce Data: {}", System.currentTimeMillis() - start);
 //                log.info("Kafka::producer topic={}, partition={}, offset={}", topic, recordMetadata.partition(), recordMetadata.offset());
             } else {
                 //failure

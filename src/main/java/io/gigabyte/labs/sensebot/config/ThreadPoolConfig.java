@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -13,21 +14,31 @@ import java.util.concurrent.TimeUnit;
 public class ThreadPoolConfig {
 
     // Define backpressure thresholds
-    private static final int HIGH_WATERMARK = 80; // Adjust as needed
-    private static final int LOW_WATERMARK = 40;  // Adjust as needed
+    private static final int HIGH_WATERMARK = 240; // Adjust as needed
+    private static final int LOW_WATERMARK = 120;  // Adjust as needed
 
-    @Bean
-    public BackpressureThreadPoolExecutor threadPoolExecutor() {
+    @Bean("backpressureThreadPoolExecutor")
+    public BackpressureThreadPoolExecutor backpressureThreadPoolExecutor() {
 
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
-          4, // core pool size
-          10, // maximum pool size
+          15, // core pool size
+          20, // maximum pool size
           60L, // idle thread keep-alive time
           TimeUnit.SECONDS, // keep-alive time unit
-          new LinkedBlockingQueue<>(100) // work queue
+          new LinkedBlockingQueue<>(300) // work queue
         );
-
         return new BackpressureThreadPoolExecutor(executor, HIGH_WATERMARK, LOW_WATERMARK);
+    }
+
+    @Bean("threadPoolExecutorSynchronousQueue")
+    public ThreadPoolExecutor threadPoolExecutor () {
+        return new ThreadPoolExecutor(
+          30, // core pool size
+          60, // maximum pool size
+          60L, // idle thread keep-alive time
+          TimeUnit.SECONDS, // keep-alive time unit
+          new SynchronousQueue<>() // work queue
+        );
     }
 
 }

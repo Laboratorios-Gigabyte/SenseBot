@@ -8,7 +8,10 @@ public record MessageRequest(
   @JsonProperty("number_of_messages_to_be_generated")
   Integer numberOfMessages,
   @JsonProperty("sleep_milliseconds")
-  int sleep
+  int sleep,
+
+  @JsonProperty("queue_type")
+  String queue
 
 ) {
     // No need to define constructors or getter/setter methods
